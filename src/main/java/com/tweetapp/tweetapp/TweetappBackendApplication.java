@@ -1,4 +1,4 @@
-package com.tweetapp.tweetapp_backend;
+package com.tweetapp.tweetapp;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

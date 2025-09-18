@@ -1,4 +1,4 @@
-package com.tweetapp.tweetapp_backend.model;
+package com.tweetapp.tweetapp.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.tweetapp.tweetapp_backend.dto;
+package com.tweetapp.tweetapp.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -1,4 +1,4 @@
-package com.tweetapp.tweetapp_backend.dto;
+package com.tweetapp.tweetapp.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

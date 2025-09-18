@@ -1,16 +1,16 @@
-package com.tweetapp.tweetapp_backend.controller;
+package com.tweetapp.tweetapp.controller;
 
-import com.tweetapp.tweetapp_backend.dto.ApiResponse;
-import com.tweetapp.tweetapp_backend.dto.CommentRequest;
-import com.tweetapp.tweetapp_backend.dto.CreatePostRequest;
-import com.tweetapp.tweetapp_backend.model.Post;
-import com.tweetapp.tweetapp_backend.service.PostService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.tweetapp.tweetapp.dto.ApiResponse;
+import com.tweetapp.tweetapp.dto.CommentRequest;
+import com.tweetapp.tweetapp.dto.CreatePostRequest;
+import com.tweetapp.tweetapp.model.Post;
+import com.tweetapp.tweetapp.service.PostService;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -32,11 +32,9 @@ public class PostController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<Post>>> getAllPosts(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size) {
+    public ResponseEntity<ApiResponse<Iterable<Post>>> getAllPosts() {
         try {
-            Page<Post> posts = postService.getAllPosts(page, size);
+            Iterable<Post> posts = postService.getAllPosts();
             return ResponseEntity.ok(ApiResponse.success(posts));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

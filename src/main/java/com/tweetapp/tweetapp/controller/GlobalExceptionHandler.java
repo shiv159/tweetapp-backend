@@ -1,11 +1,12 @@
-package com.tweetapp.tweetapp_backend.controller;
+package com.tweetapp.tweetapp.controller;
 
-import com.tweetapp.tweetapp_backend.dto.ApiResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+import com.tweetapp.tweetapp.dto.ApiResponse;
 
 import java.util.HashMap;
 import java.util.Map;

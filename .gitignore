@@ -62,3 +62,4 @@ Desktop.ini
 # Misc
 node_modules/
 coverage/
+src/main/resources/application.properties

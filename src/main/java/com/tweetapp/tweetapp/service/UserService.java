@@ -1,10 +1,11 @@
-package com.tweetapp.tweetapp_backend.service;
+package com.tweetapp.tweetapp.service;
 
-import com.tweetapp.tweetapp_backend.model.User;
-import com.tweetapp.tweetapp_backend.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
+
+import com.tweetapp.tweetapp.model.User;
+import com.tweetapp.tweetapp.repository.UserRepository;
 
 import java.util.Optional;
 
@@ -25,9 +26,7 @@ public class UserService {
         }
 
         User user = new User(username);
-        User savedUser = userRepository.save(user);
-        savedUser.setPartitionKey(savedUser.getId()); // Set partition key after ID generation
-        return userRepository.save(savedUser);
+        return userRepository.save(user);
     }
 
     public boolean userExists(String username) {
