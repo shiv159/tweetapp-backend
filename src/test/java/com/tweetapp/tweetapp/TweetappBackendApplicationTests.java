@@ -1,4 +1,4 @@
-package com.tweetapp.tweetapp_backend;
+package com.tweetapp.tweetapp;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
