@@ -1,8 +1,6 @@
 package com.tweetapp.tweetapp.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.tweetapp.tweetapp.dto.CommentRequest;
@@ -32,11 +30,10 @@ public class PostService {
 
 
     /**
-     * Retrieves a post by its ID, using cache if available.
+     * Retrieves a post by its ID.
      * @param id the post ID
      * @return an Optional containing the Post if found, or empty otherwise
      */
-    @Cacheable(value = "posts", key = "#id")
     public Optional<Post> getPostById(String id) {
         return postRepository.findById(id);
     }
@@ -67,7 +64,6 @@ public class PostService {
      * @param userId the user ID
      * @return true if the operation was successful, false if the post was not found
      */
-    @CacheEvict(value = "posts", key = "#postId")
     public boolean toggleLike(String postId, String userId) {
         Optional<Post> postOpt = postRepository.findById(postId);
         if (postOpt.isEmpty()) {
@@ -92,7 +88,6 @@ public class PostService {
      * @param request the comment request containing userId and content
      * @return true if the comment was added, false if the post was not found or the comment limit was reached
      */
-    @CacheEvict(value = "posts", key = "#postId")
     public boolean addComment(String postId, CommentRequest request) {
         Optional<Post> postOpt = postRepository.findById(postId);
         if (postOpt.isEmpty()) {

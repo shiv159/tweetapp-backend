@@ -1,7 +1,7 @@
 package com.tweetapp.tweetapp.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
+// import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import com.tweetapp.tweetapp.model.User;
@@ -15,7 +15,6 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    @Cacheable(value = "users", key = "#username")
     public Optional<User> getUserByUsername(String username) {
         return userRepository.findByUsername(username);
     }
