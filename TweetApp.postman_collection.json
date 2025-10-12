@@ -1,0 +1,267 @@
+{
+	"info": {
+		"name": "TweetApp Backend",
+		"description": "Collection for registering, authenticating, and interacting with TweetApp posts APIs.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_postman_id": "8d1f6a88-d1ad-4a23-9a5d-6f0f7aac0001"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"demoUser\",\n  \"password\": \"StrongP@ss123\",\n  \"email\": \"demo.user@example.com\",\n  \"firstName\": \"Demo\",\n  \"lastName\": \"User\",\n  \"dateOfBirth\": \"1990-01-01\"\n}"
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"if (json && json.data) {",
+									"  pm.collectionVariables.set('authToken', json.data);",
+									"  pm.test('Auth token captured', function () {",
+									"    pm.expect(pm.collectionVariables.get('authToken')).to.exist;",
+									"  });",
+									"} else {",
+									"  pm.test('Auth token missing in response', function () {",
+									"    pm.expect(json && json.data).to.exist;",
+									"  });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"demoUser\",\n  \"password\": \"StrongP@ss123\"\n}"
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Posts",
+			"item": [
+						{
+							"name": "Create Post",
+							"event": [
+								{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"const json = pm.response.json();",
+									"if (json && json.data && json.data.postId) {",
+									"  pm.collectionVariables.set('postId', json.data.postId);",
+									"  pm.test('Post ID stored for later requests', function () {",
+									"    pm.expect(pm.collectionVariables.get('postId')).to.exist;",
+									"  });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+								"request": {
+									"method": "POST",
+									"header": [
+										{
+											"key": "Content-Type",
+											"value": "application/json"
+										},
+										{
+											"key": "Authorization",
+											"value": "Bearer {{authToken}}"
+										}
+									],
+						"url": {
+							"raw": "{{baseUrl}}/api/posts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"posts"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"content\": \"Hello TweetApp!\"\n}"
+						}
+					},
+					"response": []
+				},
+						{
+							"name": "List Posts",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									}
+								],
+						"url": {
+							"raw": "{{baseUrl}}/api/posts",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"posts"
+							]
+						}
+					},
+					"response": []
+				},
+						{
+							"name": "Get Post By ID",
+							"request": {
+								"method": "GET",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									}
+								],
+						"url": {
+							"raw": "{{baseUrl}}/api/posts/{{postId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"posts",
+								"{{postId}}"
+							]
+						}
+					},
+					"response": []
+				},
+						{
+							"name": "Toggle Like",
+							"request": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									}
+								],
+						"url": {
+							"raw": "{{baseUrl}}/api/posts/{{postId}}/like",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"posts",
+								"{{postId}}",
+								"like"
+							]
+						}
+					},
+					"response": []
+				},
+						{
+							"name": "Add Comment",
+							"request": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									},
+									{
+										"key": "Authorization",
+										"value": "Bearer {{authToken}}"
+									}
+								],
+						"url": {
+							"raw": "{{baseUrl}}/api/posts/{{postId}}/comment",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"posts",
+								"{{postId}}",
+								"comment"
+							]
+						},
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"content\": \"Great update!\"\n}"
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "authToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "postId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
