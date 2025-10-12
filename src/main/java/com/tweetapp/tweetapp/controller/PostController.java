@@ -1,6 +1,7 @@
 package com.tweetapp.tweetapp.controller;
 
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import com.tweetapp.tweetapp.security.JwtAuthenticatedUser;
 @RestController
 @RequestMapping("/api/posts")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class PostController {
 
     private final PostService postService;
@@ -45,9 +47,9 @@ public class PostController {
      * Returns a list of all posts or an error if retrieval fails.
      */
     @GetMapping
-    public ResponseEntity<ApiResponse<Iterable<Post>>> getAllPosts() {
+    public ResponseEntity<ApiResponse<List<Post>>> getAllPosts() {
         try {
-            Iterable<Post> posts = postService.getAllPosts();
+            List<Post> posts = postService.getAllPosts();
             return ResponseEntity.ok(ApiResponse.success(posts));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)

@@ -44,10 +44,13 @@ public class PostService {
 
     /**
      * Retrieves all posts in the system.
-     * @return an Iterable of all Post entities
+     * Collect the repository Iterable into a List to ensure clean JSON array serialization.
+     * @return a List of all Post entities
      */
-    public Iterable<Post> getAllPosts() {
-        return postRepository.findAll();
+    public List<Post> getAllPosts() {
+        List<Post> result = new ArrayList<>();
+        postRepository.findAll().forEach(result::add);
+        return result;
     }
 
 
