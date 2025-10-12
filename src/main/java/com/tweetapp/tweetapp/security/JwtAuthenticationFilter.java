@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.MDC;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -38,6 +39,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
+
+        if (logger.isDebugEnabled()) {
+            logger.debug("JWT filter invoked: method=" + request.getMethod() + ", path=" + request.getRequestURI());
+        }
 
         // Get the Authorization header
         final String authHeader = request.getHeader("Authorization");
@@ -93,14 +98,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             request.setAttribute("authenticatedUserId", principal.getUserId());
                         }
 
+                        // Enrich MDC for logging context
+                        if (username != null) {
+                            MDC.put("username", username);
+                        }
+                        if (userId != null) {
+                            MDC.put("userId", userId);
+                        }
+
                         // Set authentication in SecurityContext (makes user "logged in" for this request)
                         SecurityContextHolder.getContext().setAuthentication(authToken);
+
+                        if (logger.isDebugEnabled()) {
+                            logger.debug("JWT authenticated: username=" + username + ", userId=" + userId);
+                        }
                     }
                 }
             } catch (Exception e) {
                 // If token is invalid, expired, or any other issue, authentication is not set
                 // Spring Security will handle unauthorized access
-                logger.warn("Invalid JWT token: " + e.getMessage());
+                logger.warn("Invalid JWT token: " + e.getMessage(), e);
             }
         }
 

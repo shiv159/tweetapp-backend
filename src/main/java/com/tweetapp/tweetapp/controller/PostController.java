@@ -3,6 +3,7 @@ package com.tweetapp.tweetapp.controller;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -19,6 +20,7 @@ import com.tweetapp.tweetapp.security.JwtAuthenticatedUser;
 @RequestMapping("/api/posts")
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*", allowedHeaders = "*")
+@Slf4j
 public class PostController {
 
     private final PostService postService;
@@ -33,10 +35,12 @@ public class PostController {
             @AuthenticationPrincipal JwtAuthenticatedUser currentUser,
             @Valid @RequestBody CreatePostRequest request) {
         try {
+            log.info("Create post by userId={}", currentUser != null ? currentUser.getUserId() : "anonymous");
             Post post = postService.createPost(currentUser.getUserId(), request);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.success(post, "Post created successfully"));
         } catch (Exception e) {
+            log.error("Failed to create post: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.error("INTERNAL_ERROR", "Failed to create post"));
         }
@@ -49,9 +53,11 @@ public class PostController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<Post>>> getAllPosts() {
         try {
+            log.debug("Fetching all posts");
             List<Post> posts = postService.getAllPosts();
             return ResponseEntity.ok(ApiResponse.success(posts));
         } catch (Exception e) {
+            log.error("Failed to retrieve posts: {}", e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.error("INTERNAL_ERROR", "Failed to retrieve posts"));
         }
@@ -64,11 +70,13 @@ public class PostController {
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<Post>> getPostById(@PathVariable String id) {
         try {
+            log.debug("Fetching post id={}", id);
             return postService.getPostById(id)
                     .map(post -> ResponseEntity.ok(ApiResponse.success(post)))
                     .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
                             .body(ApiResponse.error("NOT_FOUND", "Post not found")));
         } catch (Exception e) {
+            log.error("Failed to retrieve post {}: {}", id, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.error("INTERNAL_ERROR", "Failed to retrieve post"));
         }
@@ -85,6 +93,7 @@ public class PostController {
             @PathVariable String id,
             @AuthenticationPrincipal JwtAuthenticatedUser currentUser) {
         try {
+            log.info("Toggle like: postId={}, userId={}", id, currentUser != null ? currentUser.getUserId() : "anonymous");
             boolean success = postService.toggleLike(id, currentUser.getUserId());
             if (success) {
                 return ResponseEntity.ok(ApiResponse.success("Like toggled successfully"));
@@ -93,6 +102,7 @@ public class PostController {
                         .body(ApiResponse.error("NOT_FOUND", "Post not found"));
             }
         } catch (Exception e) {
+            log.error("Failed to toggle like for post {}: {}", id, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.error("INTERNAL_ERROR", "Failed to toggle like"));
         }
@@ -109,6 +119,7 @@ public class PostController {
             @AuthenticationPrincipal JwtAuthenticatedUser currentUser,
             @Valid @RequestBody CommentRequest request) {
         try {
+            log.info("Add comment: postId={}, userId={}", id, currentUser != null ? currentUser.getUserId() : "anonymous");
             boolean success = postService.addComment(id, currentUser.getUserId(), request);
             if (success) {
                 return ResponseEntity.status(HttpStatus.CREATED)
@@ -118,6 +129,7 @@ public class PostController {
                         .body(ApiResponse.error("BAD_REQUEST", "Failed to add comment (post not found or comment limit reached)"));
             }
         } catch (Exception e) {
+            log.error("Failed to add comment for post {}: {}", id, e.getMessage(), e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(ApiResponse.error("INTERNAL_ERROR", "Failed to add comment"));
         }

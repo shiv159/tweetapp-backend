@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Console appender with JSON layout using composite encoder -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <timestamp>
+                    <timeZone>UTC</timeZone>
+                </timestamp>
+                <logLevel/>
+                <loggerName/>
+                <threadName/>
+                <message/>
+                <arguments/>
+                <mdc/>
+                <stackTrace/>
+            </providers>
+        </encoder>
+    </appender>
+
+    <!-- Set log levels -->
+    <logger name="org.springframework" level="INFO"/>
+    <logger name="com.tweetapp.tweetapp" level="INFO"/>
+    <logger name="com.tweetapp.tweetapp.security.JwtAuthenticationFilter" level="DEBUG"/>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>
