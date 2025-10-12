@@ -49,17 +49,49 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 // Extract username from token
                 String username = jwtUtil.extractUsername(token);
+                String userId = jwtUtil.extractUserId(token).orElse(null);
 
                 // If username exists and no authentication is set yet
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                     // Load user details from database
                     UserDetails userDetails = userDetailsService.loadUserByUsername(username);
 
+                    JwtAuthenticatedUser principal;
+                    if (userDetails instanceof JwtAuthenticatedUser jwtUser) {
+                        principal = jwtUser;
+                    } else {
+                        principal = new JwtAuthenticatedUser(
+                                userId,
+                                userDetails.getUsername(),
+                                userDetails.getPassword(),
+                                userDetails.getAuthorities(),
+                                userDetails.isAccountNonExpired(),
+                                userDetails.isAccountNonLocked(),
+                                userDetails.isCredentialsNonExpired(),
+                                userDetails.isEnabled()
+                        );
+                    }
+
+                    if (principal.getUserId() == null) {
+                        userId = null;
+                    } else {
+                        userId = principal.getUserId();
+                    }
+
                     // Validate the token
                     if (jwtUtil.isTokenValid(token, username)) {
                         // Create authentication token with user details and authorities
                         UsernamePasswordAuthenticationToken authToken =
-                                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                                new UsernamePasswordAuthenticationToken(principal, null, principal.getAuthorities());
+
+                        // Attach JWT-specific details for downstream usage
+                        authToken.setDetails(new JwtAuthenticationDetails(username, userId));
+
+                        // Make the extracted identifiers accessible on the request for convenience
+                        request.setAttribute("authenticatedUsername", username);
+                        if (principal.getUserId() != null) {
+                            request.setAttribute("authenticatedUserId", principal.getUserId());
+                        }
 
                         // Set authentication in SecurityContext (makes user "logged in" for this request)
                         SecurityContextHolder.getContext().setAuthentication(authToken);

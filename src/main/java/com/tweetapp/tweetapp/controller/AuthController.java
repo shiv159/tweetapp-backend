@@ -60,8 +60,10 @@ public class AuthController {
             // Authenticate the user credentials (throws exception if invalid)
             authManager.authenticate(new UsernamePasswordAuthenticationToken(request.username, request.password));
 
-            // Generate JWT token for the authenticated user
-            String token = jwtUtil.generateToken(request.username);
+            // Fetch the authenticated user to include additional claims
+            String token = userService.getUserByUsername(request.username)
+                    .map(user -> jwtUtil.generateToken(user.getUsername(), user.getUserId()))
+                    .orElseThrow(() -> new IllegalStateException("Authenticated user record not found"));
 
             return ResponseEntity.ok(ApiResponse.success(token, "Login successful"));
         } catch (Exception e) {

@@ -6,9 +6,12 @@ import org.springframework.stereotype.Service;
 import com.tweetapp.tweetapp.dto.CommentRequest;
 import com.tweetapp.tweetapp.dto.CreatePostRequest;
 import com.tweetapp.tweetapp.model.Comment;
+import com.tweetapp.tweetapp.model.Likes;
 import com.tweetapp.tweetapp.model.Post;
 import com.tweetapp.tweetapp.repository.PostRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,8 +26,8 @@ public class PostService {
      * @param request the post creation request containing content and userId
      * @return the saved Post entity
      */
-    public Post createPost(CreatePostRequest request) {
-        Post post = new Post(request.getContent(), request.getUserId());
+    public Post createPost(String userId, CreatePostRequest request) {
+        Post post = new Post(request.getContent(), userId);
         return postRepository.save(post);
     }
 
@@ -71,10 +74,17 @@ public class PostService {
         }
 
         Post post = postOpt.get();
-        if (post.getLikes().contains(userId)) {
-            post.getLikes().remove(userId);
+        List<Likes> likes = Optional.ofNullable(post.getLikes())
+                .orElseGet(() -> {
+                    List<Likes> newLikes = new ArrayList<>();
+                    post.setLikes(newLikes);
+                    return newLikes;
+                });
+
+        if (likes.stream().anyMatch(like -> like.getUserId().equals(userId))) {
+            likes.removeIf(like -> like.getUserId().equals(userId));
         } else {
-            post.getLikes().add(userId);
+            likes.add(new Likes(userId, null));
         }
 
         postRepository.save(post);
@@ -88,7 +98,7 @@ public class PostService {
      * @param request the comment request containing userId and content
      * @return true if the comment was added, false if the post was not found or the comment limit was reached
      */
-    public boolean addComment(String postId, CommentRequest request) {
+    public boolean addComment(String postId, String userId, CommentRequest request) {
         Optional<Post> postOpt = postRepository.findById(postId);
         if (postOpt.isEmpty()) {
             return false;
@@ -101,7 +111,7 @@ public class PostService {
             return false;
         }
 
-        Comment comment = new Comment(request.getUserId(), request.getContent());
+        Comment comment = new Comment(userId, request.getContent(), null);
         post.getComments().add(comment);
 
         postRepository.save(post);

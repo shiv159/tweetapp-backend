@@ -18,14 +18,14 @@ import java.util.List;
 public class Post {
     @org.springframework.data.annotation.Id
     @GeneratedValue
-    private String id;
+    private String postId;
 
     private String content;
 
     @PartitionKey
     private String userId;
 
-    private List<String> likes = new ArrayList<>();
+    private List<Likes> likes = new ArrayList<>();
 
     private List<Comment> comments = new ArrayList<>();
 

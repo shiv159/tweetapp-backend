@@ -13,7 +13,4 @@ public class CommentRequest {
     @NotBlank(message = "Content cannot be empty")
     @Size(max = 500, message = "Comment cannot exceed 500 characters")
     private String content;
-
-    @NotBlank(message = "User ID cannot be empty")
-    private String userId;
 }

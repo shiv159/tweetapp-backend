@@ -2,6 +2,7 @@ package com.tweetapp.tweetapp.security;
 
 import com.tweetapp.tweetapp.model.User;
 import com.tweetapp.tweetapp.service.UserService;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -38,10 +39,15 @@ public class UserDetailsServiceImpl implements UserDetailsService {
 
         // Convert your User model to Spring Security's UserDetails
         // The password is already hashed in the database
-        return org.springframework.security.core.userdetails.User.builder()
-                .username(user.getUsername())  // Set username
-                .password(user.getPassword())  // Set hashed password
-                .roles("USER")  // Assign basic USER role (can be expanded for role-based access)
-                .build();
+    return new JwtAuthenticatedUser(
+        user.getUserId(),
+        user.getUsername(),
+        user.getPassword(),
+        java.util.List.of(new SimpleGrantedAuthority("ROLE_USER")),
+        true,
+        true,
+        true,
+        true
+    );
     }
 }

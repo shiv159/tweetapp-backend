@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import com.tweetapp.tweetapp.dto.ApiResponse;
@@ -11,6 +12,7 @@ import com.tweetapp.tweetapp.dto.CommentRequest;
 import com.tweetapp.tweetapp.dto.CreatePostRequest;
 import com.tweetapp.tweetapp.model.Post;
 import com.tweetapp.tweetapp.service.PostService;
+import com.tweetapp.tweetapp.security.JwtAuthenticatedUser;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -25,9 +27,11 @@ public class PostController {
      * Returns the created post with a success message or an error if creation fails.
      */
     @PostMapping
-    public ResponseEntity<ApiResponse<Post>> createPost(@Valid @RequestBody CreatePostRequest request) {
+    public ResponseEntity<ApiResponse<Post>> createPost(
+            @AuthenticationPrincipal JwtAuthenticatedUser currentUser,
+            @Valid @RequestBody CreatePostRequest request) {
         try {
-            Post post = postService.createPost(request);
+            Post post = postService.createPost(currentUser.getUserId(), request);
             return ResponseEntity.status(HttpStatus.CREATED)
                     .body(ApiResponse.success(post, "Post created successfully"));
         } catch (Exception e) {
@@ -77,9 +81,9 @@ public class PostController {
     @PutMapping("/{id}/like")
     public ResponseEntity<ApiResponse<String>> toggleLike(
             @PathVariable String id,
-            @RequestParam String userId) {
+            @AuthenticationPrincipal JwtAuthenticatedUser currentUser) {
         try {
-            boolean success = postService.toggleLike(id, userId);
+            boolean success = postService.toggleLike(id, currentUser.getUserId());
             if (success) {
                 return ResponseEntity.ok(ApiResponse.success("Like toggled successfully"));
             } else {
@@ -100,9 +104,10 @@ public class PostController {
     @PostMapping("/{id}/comment")
     public ResponseEntity<ApiResponse<String>> addComment(
             @PathVariable String id,
+            @AuthenticationPrincipal JwtAuthenticatedUser currentUser,
             @Valid @RequestBody CommentRequest request) {
         try {
-            boolean success = postService.addComment(id, request);
+            boolean success = postService.addComment(id, currentUser.getUserId(), request);
             if (success) {
                 return ResponseEntity.status(HttpStatus.CREATED)
                         .body(ApiResponse.success("Comment added successfully"));

@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class User {
     @org.springframework.data.annotation.Id
     @GeneratedValue
-    private String id;
+    private String userId;
 
     @PartitionKey
     private String username;
